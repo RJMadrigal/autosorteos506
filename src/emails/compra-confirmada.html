@@ -1,0 +1,143 @@
+<!--
+  Plantilla de correo — COMPRA CONFIRMADA
+  Variables a reemplazar al enviar:
+    {{nombre}}        Nombre completo del cliente
+    {{orderId}}       Ej: LWCR-XYZ123
+    {{numeros}}       HTML con chips de los números
+    {{cantidad}}      Cantidad de números
+    {{total}}         Total formateado (ej: ₡12 000)
+    {{referencia}}    Últimos dígitos del SINPE
+    {{fecha}}         Fecha de confirmación
+-->
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>¡Pago confirmado! · AutoSorteos506</title>
+  </head>
+  <body style="margin:0;padding:0;background:#f5f6f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#111827;">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">
+      ¡Estás dentro! Tus números quedaron oficialmente registrados para el sorteo del 23 de agosto de 2026.
+    </div>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f5f6f8;padding:32px 16px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 6px 24px rgba(17,24,39,0.06);">
+            <!-- Header -->
+            <tr>
+              <td style="background:linear-gradient(120deg,#16a34a 0%,#0f766e 100%);padding:28px 32px;color:#fff;">
+                <table role="presentation" width="100%"><tr>
+                  <td style="font-family:'Sora','Inter',sans-serif;font-size:22px;font-weight:700;letter-spacing:-0.02em;">
+                    Luxury<span style="opacity:.85;">Wheels CR</span>
+                  </td>
+                  <td align="right" style="font-size:12px;text-transform:uppercase;letter-spacing:.18em;opacity:.85;">
+                    ✓ Pago confirmado
+                  </td>
+                </tr></table>
+              </td>
+            </tr>
+
+            <!-- Hero -->
+            <tr>
+              <td style="padding:36px 32px 8px 32px;">
+                <div style="display:inline-block;background:#dcfce7;color:#15803d;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:6px 12px;border-radius:999px;">
+                  ✓ Estás dentro
+                </div>
+                <h1 style="margin:16px 0 8px 0;font-family:'Sora','Inter',sans-serif;font-size:28px;line-height:1.15;letter-spacing:-0.02em;">
+                  ¡Felicidades {{nombre}}, ya estás participando!
+                </h1>
+                <p style="margin:0;font-size:15px;line-height:1.55;color:#4b5563;">
+                  Tu pago fue verificado con éxito. Tus números quedaron <strong style="color:#111827;">oficialmente registrados</strong>
+                  a tu nombre para el sorteo del <strong style="color:#111827;">domingo 23 de agosto de 2026</strong> con la
+                  Lotería Nacional de Costa Rica.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Numbers — protagonistas -->
+            <tr>
+              <td style="padding:24px 32px 8px 32px;">
+                <p style="margin:0 0 10px 0;font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:#6b7280;">
+                  Tus {{cantidad}} números oficiales
+                </p>
+                <div style="background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);border:1px solid #fcd34d;border-radius:14px;padding:18px;line-height:2.4;">
+                  {{numeros}}
+                </div>
+                <style>
+                  .num { display:inline-block; font-family:'Menlo',ui-monospace,monospace; font-size:14px; font-weight:700; background:#ffffff; color:#111827; padding:8px 12px; border-radius:8px; margin:2px 4px 2px 0; box-shadow:0 1px 2px rgba(0,0,0,.06); }
+                </style>
+                <p style="margin:10px 0 0 0;font-size:12px;color:#6b7280;">
+                  Guardá este correo — es tu comprobante oficial de participación.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Order summary -->
+            <tr>
+              <td style="padding:16px 32px 8px 32px;">
+                <table role="presentation" width="100%" style="background:#f9fafb;border:1px solid #eef0f3;border-radius:12px;padding:18px;">
+                  <tr><td style="padding:6px 0;font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:#6b7280;">Orden</td>
+                      <td style="padding:6px 0;text-align:right;font-family:'Menlo',ui-monospace,monospace;font-size:13px;font-weight:600;">{{orderId}}</td></tr>
+                  <tr><td style="padding:6px 0;font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:#6b7280;">Referencia SINPE</td>
+                      <td style="padding:6px 0;text-align:right;font-family:'Menlo',ui-monospace,monospace;font-size:13px;">{{referencia}}</td></tr>
+                  <tr><td style="padding:6px 0;font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:#6b7280;">Confirmado el</td>
+                      <td style="padding:6px 0;text-align:right;font-size:13px;">{{fecha}}</td></tr>
+                  <tr><td style="padding:6px 0;font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:#6b7280;">Total</td>
+                      <td style="padding:6px 0;text-align:right;font-family:'Sora','Inter',sans-serif;font-size:20px;font-weight:700;color:#16a34a;">{{total}}</td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Prizes -->
+            <tr>
+              <td style="padding:24px 32px;">
+                <p style="margin:0 0 12px 0;font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:#6b7280;">Estás participando por</p>
+                <table role="presentation" width="100%">
+                  <tr>
+                    <td width="50%" style="padding-right:8px;">
+                      <div style="border:1px solid #eef0f3;border-radius:12px;padding:14px;background:#fafafa;">
+                        <p style="margin:0;font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:#c0271d;font-weight:700;">🏆 1er premio</p>
+                        <p style="margin:4px 0 0 0;font-size:15px;font-weight:700;">Mercedes-Benz CLA45 AMG</p>
+                        <p style="margin:2px 0 0 0;font-size:12px;color:#6b7280;">355 HP · 4MATIC · 0-100 en 4.6s</p>
+                      </div>
+                    </td>
+                    <td width="50%" style="padding-left:8px;">
+                      <div style="border:1px solid #eef0f3;border-radius:12px;padding:14px;background:#fafafa;">
+                        <p style="margin:0;font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:#c0271d;font-weight:700;">🏆 2do premio</p>
+                        <p style="margin:4px 0 0 0;font-size:15px;font-weight:700;">Mini Cooper 2008 Rojo</p>
+                        <p style="margin:2px 0 0 0;font-size:12px;color:#6b7280;">Manual · Turbo 15 psi · Cuero</p>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- CTA -->
+            <tr>
+              <td align="center" style="padding:8px 32px 32px 32px;">
+                <a href="https://autosorteos506.com/seguimiento" style="display:inline-block;background:#16a34a;color:#fff;text-decoration:none;font-weight:600;font-size:15px;padding:14px 28px;border-radius:12px;">
+                  Ver mis números
+                </a>
+                <p style="margin:14px 0 0 0;font-size:12px;color:#6b7280;">
+                  ¡Mucha suerte! Te avisaremos en cuanto se publiquen los resultados.<br/>
+                  Soporte: <a href="https://wa.me/50688880000" style="color:#c0271d;text-decoration:none;font-weight:600;">WhatsApp +506 8888-0000</a>
+                </p>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td style="background:#f9fafb;padding:18px 32px;text-align:center;font-size:11px;color:#9ca3af;border-top:1px solid #eef0f3;">
+                Sorteo · Domingo 23 de agosto de 2026 con la Lotería Nacional de CR<br/>
+                © 2026 AutoSorteos506 · Costa Rica 🇨🇷
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

@@ -1,0 +1,137 @@
+<!--
+  Plantilla de correo — COMPRA EN REVISIÓN
+  Variables a reemplazar al enviar:
+    {{nombre}}        Nombre completo del cliente
+    {{orderId}}       Ej: LWCR-XYZ123
+    {{numeros}}       HTML con chips de los números (ej: <span class="num">1234</span> ...)
+    {{cantidad}}      Cantidad de números (ej: 3)
+    {{total}}         Total formateado (ej: ₡12 000)
+    {{referencia}}    Últimos dígitos del SINPE
+    {{fecha}}         Fecha de compra
+-->
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Recibimos tu compra · AutoSorteos506</title>
+  </head>
+  <body style="margin:0;padding:0;background:#f5f6f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#111827;">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">
+      Recibimos tu pago. Estamos validando tu comprobante SINPE — te avisamos en menos de 30 minutos.
+    </div>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f5f6f8;padding:32px 16px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 6px 24px rgba(17,24,39,0.06);">
+            <!-- Header -->
+            <tr>
+              <td style="background:linear-gradient(120deg,#c0271d 0%,#6b21a8 100%);padding:28px 32px;color:#fff;">
+                <table role="presentation" width="100%"><tr>
+                  <td style="font-family:'Sora','Inter',sans-serif;font-size:22px;font-weight:700;letter-spacing:-0.02em;">
+                    Luxury<span style="opacity:.85;">Wheels CR</span>
+                  </td>
+                  <td align="right" style="font-size:12px;text-transform:uppercase;letter-spacing:.18em;opacity:.85;">
+                    Comprobante en revisión
+                  </td>
+                </tr></table>
+              </td>
+            </tr>
+
+            <!-- Hero -->
+            <tr>
+              <td style="padding:36px 32px 8px 32px;">
+                <div style="display:inline-block;background:#fff4e5;color:#a45a00;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:6px 12px;border-radius:999px;">
+                  ⏳ En revisión
+                </div>
+                <h1 style="margin:16px 0 8px 0;font-family:'Sora','Inter',sans-serif;font-size:28px;line-height:1.15;letter-spacing:-0.02em;">
+                  ¡Hola, {{nombre}}! Recibimos tu pago.
+                </h1>
+                <p style="margin:0;font-size:15px;line-height:1.55;color:#4b5563;">
+                  Tu comprobante SINPE está en revisión. Validamos manualmente cada transferencia — en menos de
+                  <strong style="color:#111827;">30 minutos en horario hábil</strong> te llega un segundo correo con la confirmación
+                  oficial y tus números ya bloqueados a tu nombre.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Order summary -->
+            <tr>
+              <td style="padding:24px 32px 8px 32px;">
+                <table role="presentation" width="100%" style="background:#f9fafb;border:1px solid #eef0f3;border-radius:12px;padding:18px;">
+                  <tr><td style="padding:6px 0;font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:#6b7280;">Orden</td>
+                      <td style="padding:6px 0;text-align:right;font-family:'Menlo',ui-monospace,monospace;font-size:13px;font-weight:600;">{{orderId}}</td></tr>
+                  <tr><td style="padding:6px 0;font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:#6b7280;">Cantidad de números</td>
+                      <td style="padding:6px 0;text-align:right;font-size:14px;font-weight:600;">{{cantidad}}</td></tr>
+                  <tr><td style="padding:6px 0;font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:#6b7280;">Referencia SINPE</td>
+                      <td style="padding:6px 0;text-align:right;font-family:'Menlo',ui-monospace,monospace;font-size:13px;">{{referencia}}</td></tr>
+                  <tr><td style="padding:6px 0;font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:#6b7280;">Total pagado</td>
+                      <td style="padding:6px 0;text-align:right;font-family:'Sora','Inter',sans-serif;font-size:20px;font-weight:700;color:#c0271d;">{{total}}</td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Numbers -->
+            <tr>
+              <td style="padding:16px 32px 8px 32px;">
+                <p style="margin:0 0 10px 0;font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:#6b7280;">Números reservados (pendientes de confirmación)</p>
+                <div style="line-height:2.2;">
+                  {{numeros}}
+                </div>
+                <style>
+                  .num { display:inline-block; font-family:'Menlo',ui-monospace,monospace; font-size:13px; background:#eef0f3; color:#111827; padding:6px 10px; border-radius:6px; margin:2px 4px 2px 0; }
+                </style>
+              </td>
+            </tr>
+
+            <!-- Prizes -->
+            <tr>
+              <td style="padding:24px 32px;">
+                <p style="margin:0 0 12px 0;font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:#6b7280;">Premios en juego</p>
+                <table role="presentation" width="100%">
+                  <tr>
+                    <td width="50%" style="padding-right:8px;">
+                      <div style="border:1px solid #eef0f3;border-radius:12px;padding:14px;">
+                        <p style="margin:0;font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:#c0271d;font-weight:700;">🏆 1er premio</p>
+                        <p style="margin:4px 0 0 0;font-size:15px;font-weight:700;">Mercedes-Benz CLA45 AMG</p>
+                        <p style="margin:2px 0 0 0;font-size:12px;color:#6b7280;">Con el 1er y 2do premio de la Lotería Nacional</p>
+                      </div>
+                    </td>
+                    <td width="50%" style="padding-left:8px;">
+                      <div style="border:1px solid #eef0f3;border-radius:12px;padding:14px;">
+                        <p style="margin:0;font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:#c0271d;font-weight:700;">🏆 2do premio</p>
+                        <p style="margin:4px 0 0 0;font-size:15px;font-weight:700;">Mini Cooper 2008 Rojo</p>
+                        <p style="margin:2px 0 0 0;font-size:12px;color:#6b7280;">Con los inversos del 1er y 2do premio</p>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- CTA -->
+            <tr>
+              <td align="center" style="padding:8px 32px 32px 32px;">
+                <a href="https://autosorteos506.com/seguimiento" style="display:inline-block;background:#c0271d;color:#fff;text-decoration:none;font-weight:600;font-size:15px;padding:14px 28px;border-radius:12px;">
+                  Ver el estado de mi compra
+                </a>
+                <p style="margin:14px 0 0 0;font-size:12px;color:#6b7280;">
+                  ¿Dudas? Escribinos al WhatsApp <a href="https://wa.me/50688880000" style="color:#c0271d;text-decoration:none;font-weight:600;">+506 8888-0000</a>
+                </p>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td style="background:#f9fafb;padding:18px 32px;text-align:center;font-size:11px;color:#9ca3af;border-top:1px solid #eef0f3;">
+                Sorteo · Domingo 23 de agosto de 2026 con la Lotería Nacional de CR<br/>
+                © 2026 AutoSorteos506 · Costa Rica 🇨🇷
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
