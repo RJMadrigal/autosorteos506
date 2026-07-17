@@ -31,7 +31,7 @@ export function Footer() {
                 rel="noopener noreferrer" 
                 className="hover:opacity-100 opacity-60 transition-opacity inline-flex items-center"
               >
-                <div style="font-size: 24px; font-weight: bold; margin-bottom: 15px;">LOGO</div>
+                <div style={{ fontSize: "14px", fontWeight: "bold", marginBottom: "15px" }}>LOGO</div>
               </a>
             </div>
           </div>

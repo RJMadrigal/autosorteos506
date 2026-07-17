@@ -4,7 +4,7 @@ import { Copy, Check, Upload, ShieldCheck, ArrowLeft, Smartphone, CheckCircle2, 
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { toast } from "sonner";
-import { CARS, RAFFLE } from "@/data/raffles";
+import { PRIZES, RAFFLE } from "@/data/raffles";
 import { processCheckout, getUploadUrl } from "@/lib/api/checkout.functions";
 import { reserveNumbers, releaseReservation } from "@/lib/api/raffle.functions";
 
@@ -318,14 +318,11 @@ function PagoPage() {
               <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-card">
                 <div className="p-5">
                   <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Premios en juego</p>
-                  <div className="mt-3 space-y-2">
-                    {CARS.map((c) => (
-                      <div key={c.id} className="flex items-center gap-3 p-2 rounded-lg bg-surface border border-border">
-                        <img src={c.cover} alt="" className="h-12 w-16 object-cover rounded-md" />
-                        <div className="min-w-0">
-                          <p className="text-[10px] uppercase tracking-widest font-semibold text-primary inline-flex items-center gap-1"><Trophy size={10} /> {c.prizeLabel}</p>
-                          <p className="text-sm font-semibold truncate">{c.brand} {c.model}</p>
-                        </div>
+                  <div className="grid grid-cols-1 gap-2 mt-2">
+                    {PRIZES.map((c) => (
+                      <div key={c.id} className="relative overflow-hidden rounded-xl border border-border bg-surface p-3">
+                        <p className="text-[10px] uppercase tracking-widest font-semibold inline-flex items-center gap-1 text-primary"><Trophy size={10} /> {c.prizeLabel}</p>
+                        <p className="font-display font-bold text-sm leading-tight mt-1">{c.title}</p>
                       </div>
                     ))}
                   </div>

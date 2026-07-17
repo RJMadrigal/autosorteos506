@@ -12,78 +12,32 @@ import merc04 from "@/assets/mercedez/_DSC6865.jpg.jpeg";
 import merc05 from "@/assets/mercedez/_DSC6908.jpg.jpeg";
 import merc06 from "@/assets/mercedez/_DSC6910.jpg.jpeg";
 
-/**
- * UN solo sorteo, 10.000 números, DOS autos como premios.
- *  - 1er premio (Mercedes) — gana con el 1er y 2do premio de la Lotería Nacional de CR.
- *  - 2do premio (Mini)     — gana con los inversos del 1er y 2do premio.
- * Fecha del sorteo: domingo 23 de agosto de 2026.
- */
-
-export type Car = {
-  id: "mercedes" | "mini";
-  brand: string;
-  model: string;
-  year: number;
-  color: string;
-  colorHex: string;
+export type Prize = {
+  id: string;
+  title: string;
+  subtitle: string;
   prizeLabel: string;
   prizeRule: string;
-  cover: string;
-  gallery: string[];
   features: string[];
-  accent: string;
 };
 
-export const CARS: Car[] = [
+export const PRIZES: Prize[] = [
   {
-    id: "mercedes",
-    brand: "Mercedes-Benz",
-    model: "CLA45 AMG",
-    year: 2016,
-    color: "Negro Obsidiana",
-    colorHex: "#0a0a0a",
+    id: "gran-premio",
+    title: "Gran Premio Principal",
+    subtitle: "Premio Sorpresa",
     prizeLabel: "1er Premio",
-    prizeRule:
-      "Gana con el 1er y 2do premio de la Lotería Nacional de Costa Rica",
-    cover: merc01,
-    gallery: [merc01, merc02, merc03, merc04, merc05, merc06],
+    prizeRule: "Gana con el 1er premio de la Lotería Nacional de Costa Rica",
     features: [
-      "Motor 2.0 Turbo AMG Handcrafted · 355 HP",
-      "Transmisión AMG SPEEDSHIFT DCT 7 vel.",
-      "Tracción integral 4MATIC",
-      "0-100 km/h en ~4.6 s",
-      "Sunroof panorámico",
-      "Frenos AMG con cálipers rojos",
-      "Asientos deportivos AMG",
-      'Aros 19" BBS · Kit ALFA · Fibra de carbono',
-      "94 000 km · Full extras · Papeles al día",
+      "Premio totalmente libre de impuestos",
+      "Garantía de transparencia",
+      "Auditado legalmente",
     ],
-    accent: "from-[#1a1a1a] via-[#404040] to-[#a8a8a8]",
-  },
-  {
-    id: "mini",
-    brand: "Mini",
-    model: "Cooper",
-    year: 2008,
-    color: "Azul",
-    colorHex: "#1d4ed8",
-    prizeLabel: "2do Premio",
-    prizeRule:
-      "Gana con los inversos del 1er y 2do premio de la Lotería Nacional",
-    cover: mini01,
-    gallery: [mini01, mini02, mini03, mini04, mini05, mini06],
-    features: [
-      "Intake K&N · Mufla Invidia",
-      "Turbo a 15 psi",
-      "Transmisión manual · Reloj de boost",
-      "Interior todo en cuero",
-    ],
-    accent: "from-[#c0271d] via-[#e0382a] to-[#ff6b5a]",
-  },
+  }
 ];
 
-export const getCar = (id: string | undefined): Car =>
-  CARS.find((c) => c.id === id) ?? CARS[0];
+export const getPrize = (id: string | undefined): Prize =>
+  PRIZES.find((p) => p.id === id) ?? PRIZES[0];
 
 export const RAFFLE = {
   name: "Sorteo AutoSorteos506 · Lotería Nacional",

@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SeguimientoRouteImport } from './routes/seguimiento'
 import { Route as PagoRouteImport } from './routes/pago'
-import { Route as NumerosRouteImport } from './routes/numeros'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -23,11 +22,6 @@ const SeguimientoRoute = SeguimientoRouteImport.update({
 const PagoRoute = PagoRouteImport.update({
   id: '/pago',
   path: '/pago',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NumerosRoute = NumerosRouteImport.update({
-  id: '/numeros',
-  path: '/numeros',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -44,14 +38,12 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/numeros': typeof NumerosRoute
   '/pago': typeof PagoRoute
   '/seguimiento': typeof SeguimientoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/numeros': typeof NumerosRoute
   '/pago': typeof PagoRoute
   '/seguimiento': typeof SeguimientoRoute
 }
@@ -59,22 +51,20 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/numeros': typeof NumerosRoute
   '/pago': typeof PagoRoute
   '/seguimiento': typeof SeguimientoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/numeros' | '/pago' | '/seguimiento'
+  fullPaths: '/' | '/admin' | '/pago' | '/seguimiento'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/numeros' | '/pago' | '/seguimiento'
-  id: '__root__' | '/' | '/admin' | '/numeros' | '/pago' | '/seguimiento'
+  to: '/' | '/admin' | '/pago' | '/seguimiento'
+  id: '__root__' | '/' | '/admin' | '/pago' | '/seguimiento'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
-  NumerosRoute: typeof NumerosRoute
   PagoRoute: typeof PagoRoute
   SeguimientoRoute: typeof SeguimientoRoute
 }
@@ -93,13 +83,6 @@ declare module '@tanstack/react-router' {
       path: '/pago'
       fullPath: '/pago'
       preLoaderRoute: typeof PagoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/numeros': {
-      id: '/numeros'
-      path: '/numeros'
-      fullPath: '/numeros'
-      preLoaderRoute: typeof NumerosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -122,7 +105,6 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
-  NumerosRoute: NumerosRoute,
   PagoRoute: PagoRoute,
   SeguimientoRoute: SeguimientoRoute,
 }

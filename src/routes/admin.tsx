@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Ticket, DollarSign, Users, CheckCircle2, Clock, XCircle,
   Search, Download, ExternalLink, ShieldCheck, TrendingUp, Trophy, Lock, Loader2, Ban, LogOut
 } from "lucide-react";
-import { CARS, RAFFLE } from "@/data/raffles";
+import { PRIZES, RAFFLE } from "@/data/raffles";
 import { getAdminOrders, updateOrderStatus, blockNumbers, unblockNumbers, getRaffleStats, rebuildAndConfirmOrder } from "@/lib/api/raffle.functions";
 import { supabaseBrowser } from "@/lib/supabaseBrowser";
 import { toast } from "sonner";
@@ -290,17 +290,12 @@ function AdminPage() {
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              {CARS.map((c) => (
-                <div key={c.id} className="rounded-xl border border-border bg-surface overflow-hidden">
-                  <div className="relative h-20 w-32 md:w-40">
-                    <img src={c.cover} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                    <div className="absolute bottom-1.5 left-2 text-white">
-                      <p className="text-[9px] uppercase tracking-widest font-semibold inline-flex items-center gap-1"><Trophy size={9} /> {c.prizeLabel}</p>
-                      <p className="text-xs font-bold leading-tight">{c.brand} {c.model}</p>
-                    </div>
-                  </div>
+            <div className="grid grid-cols-1 gap-3">
+              {PRIZES.map((c) => (
+                <div key={c.id} className="rounded-xl border border-border bg-surface overflow-hidden p-4">
+                   <p className="text-[10px] uppercase tracking-widest font-semibold inline-flex items-center gap-1 text-primary"><Trophy size={10} /> {c.prizeLabel}</p>
+                   <p className="text-sm font-bold leading-tight mt-1">{c.title}</p>
+                   <p className="text-xs text-muted-foreground mt-1">{c.subtitle}</p>
                 </div>
               ))}
             </div>
