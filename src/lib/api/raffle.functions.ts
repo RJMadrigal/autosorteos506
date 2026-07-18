@@ -133,7 +133,7 @@ const SearchSchema = z.object({
 });
 
 export const searchOrders = createServerFn({ method: "POST" })
-  .validator(SearchSchema)
+  .inputValidator(SearchSchema)
   .handler(async ({ data }) => {
     const { email, telefono } = data;
     const emailClean = email?.trim().toLowerCase() || "";
@@ -181,7 +181,7 @@ const AdminOrdersSchema = z.object({
 });
 
 export const getAdminOrders = createServerFn({ method: "POST" })
-  .validator(AdminOrdersSchema)
+  .inputValidator(AdminOrdersSchema)
   .handler(async ({ data }) => {
     try {
       await validateAdminToken(data.token);
@@ -227,7 +227,7 @@ const UpdateStatusSchema = z.object({
 });
 
 export const updateOrderStatus = createServerFn({ method: "POST" })
-  .validator(UpdateStatusSchema)
+  .inputValidator(UpdateStatusSchema)
   .handler(async ({ data }) => {
     await validateAdminToken(data.token);
 
@@ -308,7 +308,7 @@ const UpdateNumbersSchema = z.object({
 });
 
 export const updateOrderNumbers = createServerFn({ method: "POST" })
-  .validator(UpdateNumbersSchema)
+  .inputValidator(UpdateNumbersSchema)
   .handler(async ({ data }) => {
     await validateAdminToken(data.token);
 
@@ -336,7 +336,7 @@ const RebuildOrderSchema = z.object({
 });
 
 export const rebuildAndConfirmOrder = createServerFn({ method: "POST" })
-  .validator(RebuildOrderSchema)
+  .inputValidator(RebuildOrderSchema)
   .handler(async ({ data }) => {
     await validateAdminToken(data.token);
 
@@ -408,7 +408,7 @@ const BlockSchema = z.object({
 });
 
 export const blockNumbers = createServerFn({ method: "POST" })
-  .validator(BlockSchema)
+  .inputValidator(BlockSchema)
   .handler(async ({ data }) => {
     await validateAdminToken(data.token);
 
@@ -435,7 +435,7 @@ const UnblockSchema = z.object({
 });
 
 export const unblockNumbers = createServerFn({ method: "POST" })
-  .validator(UnblockSchema)
+  .inputValidator(UnblockSchema)
   .handler(async ({ data }) => {
     await validateAdminToken(data.token);
 
@@ -462,7 +462,7 @@ const ReserveSchema = z.object({
 });
 
 export const reserveNumbers = createServerFn({ method: "POST" })
-  .validator(ReserveSchema)
+  .inputValidator(ReserveSchema)
   .handler(async ({ data }) => {
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
@@ -483,7 +483,7 @@ export const reserveNumbers = createServerFn({ method: "POST" })
 
 const ReleaseSchema = z.object({ sessionId: z.string().min(1) });
 export const releaseReservation = createServerFn({ method: "POST" })
-  .validator(ReleaseSchema)
+  .inputValidator(ReleaseSchema)
   .handler(async ({ data }) => {
     await supabaseServer.rpc("release_session_tickets", {
       p_session_id: data.sessionId
