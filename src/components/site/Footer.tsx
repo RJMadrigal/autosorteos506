@@ -10,8 +10,8 @@ export function Footer() {
           </div>
 
           <div className="flex items-center gap-3">
-            <a href="https://instagram.com/luxurywheells.cr" target="_blank" rel="noreferrer" aria-label="Instagram" className="h-10 w-10 rounded-lg border border-border bg-card grid place-items-center hover:bg-surface-2 transition">
-              <Instagram size={16} />
+            <a href="https://instagram.com/autosorteos506" target="_blank" rel="noreferrer" aria-label="Instagram" className="h-10 w-10 rounded-lg border border-border bg-card grid place-items-center hover:bg-surface-2 transition">
+              <Instagram size={18} className="text-muted-foreground" />
             </a>
             <a href="https://www.facebook.com/share/19J7vbzmr1/?mibextid=wwXIfr" target="_blank" rel="noreferrer" aria-label="Facebook" className="h-10 w-10 rounded-lg border border-border bg-card grid place-items-center hover:bg-surface-2 transition">
               <Facebook size={16} />
