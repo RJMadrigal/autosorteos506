@@ -277,11 +277,11 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
       throw new Error("Error al actualizar estado");
     }
 
-    if (data.status === "rechazado") {
+    if (data.status === "rechazado" && order?.numbers) {
       const { error: ticketError } = await supabaseServer
         .from("tickets")
         .delete()
-        .eq("order_id", data.orderId);
+        .in("number", order.numbers);
         
       if (ticketError) {
         console.error("Error liberating tickets:", ticketError);
