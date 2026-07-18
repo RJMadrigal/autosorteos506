@@ -448,17 +448,17 @@ function AdminPage() {
                     <Td><StatusBadge status={t.status} /></Td>
                     <Td className="text-right">
                       <div className="inline-flex gap-1">
-                        <button onClick={() => handleOpenEdit(t)} className="p-1.5 rounded-md bg-accent/10 text-accent hover:bg-accent/20" title="Editar Números">
-                          <Edit size={14} />
+                        <button onClick={() => handleOpenEdit(t)} className="p-1.5 rounded-md bg-blue-500/20 text-blue-400 hover:bg-blue-500/40 transition-colors" title="Editar Números">
+                          <Edit size={16} />
                         </button>
                         {t.status !== "confirmado" && (
-                          <button onClick={() => setStatus(t.order_id, "confirmado")} className="p-1.5 rounded-md bg-success/15 text-success hover:bg-success/25" title="Aprobar">
-                            <CheckCircle2 size={14} />
+                          <button onClick={() => setStatus(t.order_id, "confirmado")} className="p-1.5 rounded-md bg-green-500/20 text-green-400 hover:bg-green-500/40 transition-colors" title="Aprobar">
+                            <CheckCircle2 size={16} />
                           </button>
                         )}
                         {t.status !== "rechazado" && (
-                          <button onClick={() => setStatus(t.order_id, "rechazado")} className="p-1.5 rounded-md bg-destructive/15 text-destructive hover:bg-destructive/25" title="Rechazar">
-                            <XCircle size={14} />
+                          <button onClick={() => setStatus(t.order_id, "rechazado")} className="p-1.5 rounded-md bg-red-500/20 text-red-400 hover:bg-red-500/40 transition-colors" title="Rechazar">
+                            <XCircle size={16} />
                           </button>
                         )}
                       </div>
