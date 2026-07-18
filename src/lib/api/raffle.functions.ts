@@ -133,6 +133,7 @@ const SearchSchema = z.object({
 });
 
 export const searchOrders = createServerFn({ method: "POST" })
+  .validator(SearchSchema)
   .handler(async ({ data }) => {
     const { email, telefono } = data;
     const emailClean = email?.trim().toLowerCase() || "";
@@ -180,6 +181,7 @@ const AdminOrdersSchema = z.object({
 });
 
 export const getAdminOrders = createServerFn({ method: "POST" })
+  .validator(AdminOrdersSchema)
   .handler(async ({ data }) => {
     try {
       await validateAdminToken(data.token);
@@ -225,6 +227,7 @@ const UpdateStatusSchema = z.object({
 });
 
 export const updateOrderStatus = createServerFn({ method: "POST" })
+  .validator(UpdateStatusSchema)
   .handler(async ({ data }) => {
     await validateAdminToken(data.token);
 
@@ -295,6 +298,35 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
   });
 
 // ─────────────────────────────────────────────────────────────
+// 5.0.5 ADMIN: EDIT ORDER NUMBERS
+// ─────────────────────────────────────────────────────────────
+const UpdateNumbersSchema = z.object({
+  token: z.string().min(1),
+  orderId: z.string().min(1),
+  newNumbers: z.array(z.string()),
+  newTotal: z.number()
+});
+
+export const updateOrderNumbers = createServerFn({ method: "POST" })
+  .validator(UpdateNumbersSchema)
+  .handler(async ({ data }) => {
+    await validateAdminToken(data.token);
+
+    const { data: updated, error } = await supabaseServer.rpc("update_order_tickets", {
+      p_order_id: data.orderId,
+      p_new_numbers: data.newNumbers,
+      p_new_total: data.newTotal
+    });
+
+    if (error) {
+      console.error("[updateOrderNumbers error]", error);
+      throw new Error(error.message || "Error al actualizar los números");
+    }
+
+    return { success: true };
+  });
+
+// ─────────────────────────────────────────────────────────────
 // 5.1 ADMIN: REBUILD AND CONFIRM ORDER (CONFLICT RESOLUTION)
 // ─────────────────────────────────────────────────────────────
 const RebuildOrderSchema = z.object({
@@ -304,6 +336,7 @@ const RebuildOrderSchema = z.object({
 });
 
 export const rebuildAndConfirmOrder = createServerFn({ method: "POST" })
+  .validator(RebuildOrderSchema)
   .handler(async ({ data }) => {
     await validateAdminToken(data.token);
 
@@ -375,6 +408,7 @@ const BlockSchema = z.object({
 });
 
 export const blockNumbers = createServerFn({ method: "POST" })
+  .validator(BlockSchema)
   .handler(async ({ data }) => {
     await validateAdminToken(data.token);
 
@@ -401,6 +435,7 @@ const UnblockSchema = z.object({
 });
 
 export const unblockNumbers = createServerFn({ method: "POST" })
+  .validator(UnblockSchema)
   .handler(async ({ data }) => {
     await validateAdminToken(data.token);
 
@@ -427,6 +462,7 @@ const ReserveSchema = z.object({
 });
 
 export const reserveNumbers = createServerFn({ method: "POST" })
+  .validator(ReserveSchema)
   .handler(async ({ data }) => {
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
@@ -445,7 +481,9 @@ export const reserveNumbers = createServerFn({ method: "POST" })
     return { success: true, expiresAt };
   });
 
+const ReleaseSchema = z.object({ sessionId: z.string().min(1) });
 export const releaseReservation = createServerFn({ method: "POST" })
+  .validator(ReleaseSchema)
   .handler(async ({ data }) => {
     await supabaseServer.rpc("release_session_tickets", {
       p_session_id: data.sessionId

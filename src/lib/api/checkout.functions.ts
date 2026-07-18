@@ -17,7 +17,9 @@ const CheckoutSchema = z.object({
 
 export type CheckoutInput = z.infer<typeof CheckoutSchema>;
 
+const UploadUrlSchema = z.object({ fileExt: z.string().min(1) });
 export const getUploadUrl = createServerFn({ method: "POST" })
+  .validator(UploadUrlSchema)
   .handler(async ({ data }) => {
     const timestamp = Date.now().toString(36).toUpperCase().slice(-4);
     const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase();
@@ -42,6 +44,7 @@ export const getUploadUrl = createServerFn({ method: "POST" })
   });
 
 export const processCheckout = createServerFn({ method: "POST" })
+  .validator(CheckoutSchema)
   .handler(async ({ data }) => {
     const {
       nombre, cedula, telefono, email, referencia,
@@ -75,7 +78,7 @@ export const processCheckout = createServerFn({ method: "POST" })
       .from("orders")
       .insert({
         order_id: orderId,
-        raffle_name: "Sorteo AutoSorteos506 · Mercedes + Mini",
+        raffle_name: "Sorteo AutoSorteos506",
         numbers: numbers,
         total: total,
         nombre: nombre,

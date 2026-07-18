@@ -79,25 +79,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "theme-color", content: "#0a0a12" },
-      { title: "AutoSorteos506 — Sorteos de vehículos transparentes" },
-      { name: "description", content: "Participá por un Mercedes CLA45 AMG y un Mini Cooper S por solo ₡4.000. Sorteo oficial y transparente en Costa Rica." },
+      { title: "AutoSorteos506 — Sorteos transparentes" },
+      { name: "description", content: "Participá por premios increíbles por solo ₡4.000. Sorteo oficial y transparente en Costa Rica." },
       
       // Open Graph (WhatsApp, Facebook, etc)
       { property: "og:type", content: "website" },
-      { property: "og:title", content: "AutoSorteos506 — Sorteo Mercedes + Mini Cooper" },
-      { property: "og:description", content: "Ganá un Mercedes-Benz CLA45 AMG y un Mini Cooper S por solo ₡4.000 el ticket. ¡Participá ahora!" },
+      { property: "og:title", content: "AutoSorteos506 — Sorteo de Premios" },
+      { property: "og:description", content: "Ganá premios increíbles por solo ₡4.000 el ticket. ¡Participá ahora!" },
       { property: "og:image", content: "/og-image.png" },
       { property: "og:url", content: "https://autosorteos506.com" }, // Cambiar por el dominio final
       
       // Twitter / X
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "AutoSorteos506 — Sorteo Mercedes + Mini Cooper" },
-      { name: "twitter:description", content: "Ganá un Mercedes CLA45 AMG y un Mini Cooper S por solo ₡4.000 el ticket. ¡Participá ahora!" },
+      { name: "twitter:title", content: "AutoSorteos506 — Sorteo de Premios" },
+      { name: "twitter:description", content: "Ganá premios increíbles por solo ₡4.000 el ticket. ¡Participá ahora!" },
       { name: "twitter:image", content: "/og-image.png" },
     ],
     links: [
-      { rel: "icon", type: "image/png", href: "/favicon.png" },
-      { rel: "apple-touch-icon", href: "/favicon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {

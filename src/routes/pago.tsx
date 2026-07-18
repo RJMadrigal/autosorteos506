@@ -18,8 +18,8 @@ export const Route = createFileRoute("/pago")({
   component: PagoPage,
 });
 
-const SINPE_NUMBER = "7279-8135";
-const SINPE_NAME = "ET. SOLUCIONES EMPRESARIALES LIMITADA";
+const SINPE_NUMBER = "8888-8888";
+const SINPE_NAME = "Empresa Demo S.A.";
 
 function pad(n: number) { return n.toString().padStart(4, "0"); }
 
@@ -200,7 +200,7 @@ function PagoPage() {
             </p>
             <div className="bg-card border border-border rounded-2xl p-4 mt-6 text-left shadow-card">
               <p className="text-xs uppercase tracking-widest text-muted-foreground">Resumen</p>
-              <div className="flex justify-between mt-2"><span>Sorteo</span><span className="font-semibold">Mercedes + Mini</span></div>
+              <div className="flex justify-between mt-2"><span>Sorteo</span><span className="font-semibold">AutoSorteos506</span></div>
               <div className="flex justify-between mt-1"><span>Números</span><span className="font-mono tabular-nums">{selected.length}</span></div>
               <div className="flex justify-between mt-1"><span>Total pagado</span><span className="font-bold tabular-nums">₡{total.toLocaleString("es-CR")}</span></div>
               <div className="flex justify-between mt-1"><span>Referencia</span><span className="font-mono">{form.referencia}</span></div>

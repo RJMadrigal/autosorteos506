@@ -39,7 +39,7 @@ export async function sendStatusEmail(
     }
 
     const { data, error } = await resend.emails.send({
-      from: "AutoSorteos506 <sorteos@autosorteos506.com>", // Dominio oficial
+      from: "AutoSorteos506 <onboarding@resend.dev>", // Usando sandbox mientras se verifica dominio
       to: [to],
       subject,
       html: `

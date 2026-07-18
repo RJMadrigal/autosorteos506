@@ -2,10 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
 import {
   LayoutDashboard, Ticket, DollarSign, Users, CheckCircle2, Clock, XCircle,
-  Search, Download, ExternalLink, ShieldCheck, TrendingUp, Trophy, Lock, Loader2, Ban, LogOut
+  Search, Download, ExternalLink, ShieldCheck, TrendingUp, Trophy, Lock, Loader2, Ban, LogOut, Edit
 } from "lucide-react";
 import { PRIZES, RAFFLE } from "@/data/raffles";
-import { getAdminOrders, updateOrderStatus, blockNumbers, unblockNumbers, getRaffleStats, rebuildAndConfirmOrder } from "@/lib/api/raffle.functions";
+import { getAdminOrders, updateOrderStatus, blockNumbers, unblockNumbers, getRaffleStats, rebuildAndConfirmOrder, updateOrderNumbers } from "@/lib/api/raffle.functions";
 import { supabaseBrowser } from "@/lib/supabaseBrowser";
 import { toast } from "sonner";
 
@@ -56,6 +56,12 @@ function AdminPage() {
   const [conflictData, setConflictData] = useState<{ takenNumbers: string[], originalNumbers: string[] } | null>(null);
   const [newNumbersInput, setNewNumbersInput] = useState("");
   const [isRebuilding, setIsRebuilding] = useState(false);
+
+  // Edit Order State
+  const [editOrder, setEditOrder] = useState<DBOrder | null>(null);
+  const [editNumbersInput, setEditNumbersInput] = useState("");
+  const [editTotalInput, setEditTotalInput] = useState("");
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   const loadData = async (token: string) => {
     try {
@@ -168,9 +174,49 @@ function AdminPage() {
       setConflictData(null);
       loadData(sessionToken);
     } catch (err: any) {
-      toast.error(err.message || "Error al reconstruir la orden");
+      toast.error(err.message || "Error de red");
     } finally {
       setIsRebuilding(false);
+    }
+  };
+
+  const handleOpenEdit = (order: DBOrder) => {
+    setEditOrder(order);
+    setEditNumbersInput(order.numbers.join(", "));
+    setEditTotalInput(order.total.toString());
+  };
+
+  const handleEditNumbersChange = (val: string) => {
+    setEditNumbersInput(val);
+    const count = val.split(",").map(n => n.trim()).filter(n => n.match(/^\d+$/)).length;
+    setEditTotalInput((count * RAFFLE.ticketPrice).toString());
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editOrder || !sessionToken) return;
+    setIsSavingEdit(true);
+    try {
+      const newNumbers = editNumbersInput.split(",").map(n => pad(n.trim())).filter(n => n.match(/^\d+$/));
+      const newTotal = parseFloat(editTotalInput) || 0;
+      
+      const res = await updateOrderNumbers({
+        data: {
+          token: sessionToken,
+          orderId: editOrder.order_id,
+          newNumbers,
+          newTotal
+        }
+      });
+      
+      if (res.success) {
+        toast.success("Orden actualizada correctamente");
+        setEditOrder(null);
+        await loadData(sessionToken);
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Error al actualizar la orden");
+    } finally {
+      setIsSavingEdit(false);
     }
   };
 
@@ -402,6 +448,9 @@ function AdminPage() {
                     <Td><StatusBadge status={t.status} /></Td>
                     <Td className="text-right">
                       <div className="inline-flex gap-1">
+                        <button onClick={() => handleOpenEdit(t)} className="p-1.5 rounded-md bg-accent/10 text-accent hover:bg-accent/20" title="Editar Números">
+                          <Edit size={14} />
+                        </button>
                         {t.status !== "confirmado" && (
                           <button onClick={() => setStatus(t.order_id, "confirmado")} className="p-1.5 rounded-md bg-success/15 text-success hover:bg-success/25" title="Aprobar">
                             <CheckCircle2 size={14} />
@@ -465,6 +514,52 @@ function AdminPage() {
                 disabled={isRebuilding}
               >
                 {isRebuilding ? <Loader2 className="animate-spin" size={16} /> : "Guardar y Confirmar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {editOrder && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-card border border-border rounded-2xl p-6 max-w-md w-full shadow-gold relative">
+            <h2 className="font-display text-xl font-bold mb-4">Editar Orden</h2>
+            
+            <label className="block mb-4">
+              <span className="text-xs uppercase tracking-widest text-muted-foreground block mb-1">Números (separados por coma)</span>
+              <textarea
+                value={editNumbersInput}
+                onChange={e => handleEditNumbersChange(e.target.value)}
+                className="w-full bg-surface border border-border rounded-lg px-4 py-3 text-sm font-mono min-h-[100px]"
+                placeholder="Ej: 0012, 0104, 1500"
+              />
+            </label>
+
+            <label className="block mb-6">
+              <span className="text-xs uppercase tracking-widest text-muted-foreground block mb-1">Total a cobrar (₡)</span>
+              <input
+                type="number"
+                value={editTotalInput}
+                onChange={e => setEditTotalInput(e.target.value)}
+                className="w-full bg-surface border border-border rounded-lg px-4 py-2.5 text-sm tabular-nums font-bold"
+              />
+            </label>
+            
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setEditOrder(null)} 
+                className="flex-1 px-4 py-2 bg-surface border border-border rounded-lg text-sm font-medium hover:bg-surface-2"
+                disabled={isSavingEdit}
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={handleSaveEdit} 
+                className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium shadow-gold flex justify-center items-center gap-2"
+                disabled={isSavingEdit}
+              >
+                {isSavingEdit ? <Loader2 className="animate-spin" size={16} /> : "Guardar Cambios"}
               </button>
             </div>
           </div>
