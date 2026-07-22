@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import ws from "ws";
 import { z } from "zod";
-import { supabaseServer } from "../supabase.server";
+import { supabaseServer, logOrderAction } from "../supabase.server";
 import { sendStatusEmail } from "./email.server";
 
 // ─────────────────────────────────────────────────────────────
@@ -133,7 +133,7 @@ const SearchSchema = z.object({
 });
 
 export const searchOrders = createServerFn({ method: "POST" })
-  .inputValidator(SearchSchema)
+  .validator(SearchSchema)
   .handler(async ({ data }) => {
     const { email, telefono } = data;
     const emailClean = email?.trim().toLowerCase() || "";
@@ -181,7 +181,7 @@ const AdminOrdersSchema = z.object({
 });
 
 export const getAdminOrders = createServerFn({ method: "POST" })
-  .inputValidator(AdminOrdersSchema)
+  .validator(AdminOrdersSchema)
   .handler(async ({ data }) => {
     try {
       await validateAdminToken(data.token);
@@ -189,7 +189,10 @@ export const getAdminOrders = createServerFn({ method: "POST" })
 
       const { data: orders, error } = await supabaseServer
         .from("orders")
-        .select("*")
+        .select(`
+          *,
+          order_logs(count)
+        `)
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -218,6 +221,37 @@ export const getAdminOrders = createServerFn({ method: "POST" })
   });
 
 // ─────────────────────────────────────────────────────────────
+// 4.5 ADMIN: GET ORDER LOGS
+// ─────────────────────────────────────────────────────────────
+const OrderLogsSchema = z.object({
+  token: z.string().min(1),
+  orderId: z.string().min(1),
+});
+
+export const getOrderLogs = createServerFn({ method: "POST" })
+  .validator(OrderLogsSchema)
+  .handler(async ({ data }) => {
+    try {
+      await validateAdminToken(data.token);
+
+      const { data: logs, error } = await supabaseServer
+        .from("order_logs")
+        .select("*")
+        .eq("order_id", data.orderId)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return { logs: logs ?? [] };
+    } catch (err: any) {
+      console.error("[getOrderLogs error]", err.message);
+      return { error: err.message, logs: [] };
+    }
+  });
+
+// ─────────────────────────────────────────────────────────────
 // 5. ADMIN: UPDATE ORDER STATUS
 // ─────────────────────────────────────────────────────────────
 const UpdateStatusSchema = z.object({
@@ -227,7 +261,7 @@ const UpdateStatusSchema = z.object({
 });
 
 export const updateOrderStatus = createServerFn({ method: "POST" })
-  .inputValidator(UpdateStatusSchema)
+  .validator(UpdateStatusSchema)
   .handler(async ({ data }) => {
     await validateAdminToken(data.token);
 
@@ -277,6 +311,10 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
       throw new Error("Error al actualizar estado");
     }
 
+    if (order?.status !== data.status) {
+      await logOrderAction(data.orderId, "estado_actualizado", { from: order?.status, to: data.status }, "admin");
+    }
+
     if (data.status === "rechazado" && order?.numbers) {
       const { error: ticketError } = await supabaseServer
         .from("tickets")
@@ -298,30 +336,73 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
   });
 
 // ─────────────────────────────────────────────────────────────
-// 5.0.5 ADMIN: EDIT ORDER NUMBERS
+// 5.0.5 ADMIN: EDIT ORDER DETAILS
 // ─────────────────────────────────────────────────────────────
-const UpdateNumbersSchema = z.object({
+const UpdateDetailsSchema = z.object({
   token: z.string().min(1),
   orderId: z.string().min(1),
   newNumbers: z.array(z.string()),
-  newTotal: z.number()
+  newTotal: z.number(),
+  nombre: z.string().min(1),
+  cedula: z.string(),
+  telefono: z.string().min(1),
+  email: z.string(),
+  referencia: z.string().min(1),
 });
 
-export const updateOrderNumbers = createServerFn({ method: "POST" })
-  .inputValidator(UpdateNumbersSchema)
+export const updateOrderDetails = createServerFn({ method: "POST" })
+  .validator(UpdateDetailsSchema)
   .handler(async ({ data }) => {
     await validateAdminToken(data.token);
 
-    const { data: updated, error } = await supabaseServer.rpc("update_order_tickets", {
+    // Get old details for logging
+    const { data: oldOrder } = await supabaseServer
+      .from("orders")
+      .select("*")
+      .eq("order_id", data.orderId)
+      .single();
+
+    // 1. Update tickets and total via RPC
+    const { data: updatedTickets, error: rpcError } = await supabaseServer.rpc("update_order_tickets", {
       p_order_id: data.orderId,
       p_new_numbers: data.newNumbers,
       p_new_total: data.newTotal
     });
 
-    if (error) {
-      console.error("[updateOrderNumbers error]", error);
-      throw new Error(error.message || "Error al actualizar los números");
+    if (rpcError) {
+      console.error("[updateOrderDetails RPC error]", rpcError);
+      throw new Error(rpcError.message || "Error al actualizar los números");
     }
+
+    // 2. Update string fields
+    const { error: updateError } = await supabaseServer
+      .from("orders")
+      .update({
+        nombre: data.nombre,
+        cedula: data.cedula,
+        telefono: data.telefono,
+        email: data.email,
+        referencia: data.referencia
+      })
+      .eq("order_id", data.orderId);
+
+    if (updateError) {
+      throw new Error("Error al actualizar la información de contacto.");
+    }
+
+    // 3. Log the change
+    await logOrderAction(data.orderId, "editada", { 
+      from: oldOrder, 
+      to: { 
+        nombre: data.nombre, 
+        cedula: data.cedula, 
+        telefono: data.telefono, 
+        email: data.email, 
+        referencia: data.referencia, 
+        numbers: data.newNumbers, 
+        total: data.newTotal 
+      } 
+    }, "admin");
 
     return { success: true };
   });
@@ -336,7 +417,7 @@ const RebuildOrderSchema = z.object({
 });
 
 export const rebuildAndConfirmOrder = createServerFn({ method: "POST" })
-  .inputValidator(RebuildOrderSchema)
+  .validator(RebuildOrderSchema)
   .handler(async ({ data }) => {
     await validateAdminToken(data.token);
 
@@ -408,9 +489,26 @@ const BlockSchema = z.object({
 });
 
 export const blockNumbers = createServerFn({ method: "POST" })
-  .inputValidator(BlockSchema)
+  .validator(BlockSchema)
   .handler(async ({ data }) => {
     await validateAdminToken(data.token);
+
+    const { data: existing } = await supabaseServer
+      .from("tickets")
+      .select("number, status, expires_at")
+      .in("number", data.numbers);
+
+    if (existing && existing.length > 0) {
+      const now = new Date();
+      const conflicts = existing.filter(t => {
+        if (t.status === "vendido") return true;
+        if (t.status === "reservado" && t.expires_at && new Date(t.expires_at) > now) return true;
+        return false;
+      });
+      if (conflicts.length > 0) {
+        throw new Error(`No se puede bloquear: ${conflicts.map(c => c.number).join(", ")} están vendidos o en proceso de compra.`);
+      }
+    }
 
     const rows = data.numbers.map((n) => ({
       number: n,
@@ -435,7 +533,7 @@ const UnblockSchema = z.object({
 });
 
 export const unblockNumbers = createServerFn({ method: "POST" })
-  .inputValidator(UnblockSchema)
+  .validator(UnblockSchema)
   .handler(async ({ data }) => {
     await validateAdminToken(data.token);
 
@@ -462,7 +560,7 @@ const ReserveSchema = z.object({
 });
 
 export const reserveNumbers = createServerFn({ method: "POST" })
-  .inputValidator(ReserveSchema)
+  .validator(ReserveSchema)
   .handler(async ({ data }) => {
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
@@ -483,7 +581,7 @@ export const reserveNumbers = createServerFn({ method: "POST" })
 
 const ReleaseSchema = z.object({ sessionId: z.string().min(1) });
 export const releaseReservation = createServerFn({ method: "POST" })
-  .inputValidator(ReleaseSchema)
+  .validator(ReleaseSchema)
   .handler(async ({ data }) => {
     await supabaseServer.rpc("release_session_tickets", {
       p_session_id: data.sessionId

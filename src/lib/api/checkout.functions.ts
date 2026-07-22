@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { supabaseServer } from "../supabase.server";
+import { supabaseServer, logOrderAction } from "../supabase.server";
 import { sendStatusEmail } from "./email.server";
 
 const CheckoutSchema = z.object({
@@ -19,7 +19,7 @@ export type CheckoutInput = z.infer<typeof CheckoutSchema>;
 
 const UploadUrlSchema = z.object({ fileExt: z.string().min(1) });
 export const getUploadUrl = createServerFn({ method: "POST" })
-  .inputValidator(UploadUrlSchema)
+  .validator(UploadUrlSchema)
   .handler(async ({ data }) => {
     const timestamp = Date.now().toString(36).toUpperCase().slice(-4);
     const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase();
@@ -44,7 +44,7 @@ export const getUploadUrl = createServerFn({ method: "POST" })
   });
 
 export const processCheckout = createServerFn({ method: "POST" })
-  .inputValidator(CheckoutSchema)
+  .validator(CheckoutSchema)
   .handler(async ({ data }) => {
     const {
       nombre, cedula, telefono, email, referencia,
@@ -99,6 +99,9 @@ export const processCheckout = createServerFn({ method: "POST" })
       // or we could rollback to 'reservado'. But DB insert failures are rare.
       throw new Error(`Error al guardar la orden: ${dbError.message}`);
     }
+
+    // 3.5 Log the creation
+    await logOrderAction(orderId, "creada", { numbers, total, nombre, email, telefono, referencia }, "cliente");
 
     // 4. Send confirmation email (non-blocking on failure)
     if (email) {

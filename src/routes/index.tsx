@@ -94,6 +94,61 @@ function HomePage() {
     if (!soldSet.has(n)) toggle(n);
   };
 
+  const addRandomCombo = (count: number) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      let added = 0;
+      let tries = 0;
+      while (added < count && tries < count * 50) {
+        let n = Math.floor(Math.random() * TOTAL);
+        if (!soldSet.has(n) && !next.has(n)) {
+          next.add(n);
+          added++;
+        }
+        tries++;
+      }
+      if (added > 0) {
+        toast.success(`Se agregaron ${added} números al azar`);
+      } else {
+        toast.error("No hay suficientes números disponibles");
+      }
+      return next;
+    });
+  };
+
+  const addInverted = () => {
+    if (selected.size === 0) {
+      toast.error("Seleccioná un número primero para agregar su invertido");
+      return;
+    }
+    const lastNum = Array.from(selected).pop();
+    if (lastNum !== undefined) {
+      const padded = pad(lastNum);
+      const invertedStr = padded.split("").reverse().join("");
+      const invertedNum = parseInt(invertedStr, 10);
+      
+      if (invertedNum >= TOTAL) {
+         toast.error(`El invertido ${invertedStr} es mayor al total (${TOTAL})`);
+         return;
+      }
+      if (soldSet.has(invertedNum)) {
+         toast.error(`El invertido ${invertedStr} ya está vendido`);
+         return;
+      }
+      if (selected.has(invertedNum)) {
+         toast.error(`El invertido ${invertedStr} ya lo seleccionaste`);
+         return;
+      }
+      
+      setSelected(prev => {
+         const next = new Set(prev);
+         next.add(invertedNum);
+         return next;
+      });
+      toast.success(`Invertido ${invertedStr} agregado con éxito`);
+    }
+  };
+
   const total = selected.size * TICKET_PRICE;
   const soldCount = soldSet.size;
   const availableCount = TOTAL - soldCount;
@@ -103,6 +158,9 @@ function HomePage() {
       <Nav />
       <main className="pt-28 pb-40">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
+          <div className="flex justify-center mb-10">
+            <img src="/autosorteos506.png" alt="AutoSorteos506" className="h-20 md:h-28 w-auto object-contain drop-shadow-[0_0_25px_rgba(212,175,55,0.3)] hover:scale-105 transition-transform duration-500 animate-fade-up" />
+          </div>
           
           {/* Generic Prize Section & Countdown */}
           <div className="grid md:grid-cols-2 gap-5 mb-8">
@@ -203,20 +261,36 @@ function HomePage() {
                 className="w-full bg-surface border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
               />
             </div>
-            <button
-              onClick={randomPick}
-              disabled={loadingSold}
-              className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-lg border border-border hover:bg-surface disabled:opacity-40"
-            >
-              <Shuffle size={14} /> Al azar
-            </button>
+            
+            <div className="flex flex-wrap gap-2 items-center border-l border-border pl-4 ml-2">
+              <button
+                onClick={randomPick}
+                disabled={loadingSold}
+                className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-lg border border-border hover:bg-surface disabled:opacity-40"
+              >
+                <Shuffle size={14} /> +1
+              </button>
+              <button onClick={() => addRandomCombo(5)} disabled={loadingSold} className="inline-flex items-center text-sm font-bold px-3 py-2 rounded-lg bg-surface border border-border hover:bg-surface-2 text-primary disabled:opacity-40">+5</button>
+              <button onClick={() => addRandomCombo(10)} disabled={loadingSold} className="inline-flex items-center text-sm font-bold px-3 py-2 rounded-lg bg-surface border border-border hover:bg-surface-2 text-primary disabled:opacity-40">+10</button>
+              <button onClick={() => addRandomCombo(20)} disabled={loadingSold} className="inline-flex items-center text-sm font-bold px-3 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-40 shadow-gold">+20</button>
+              
+              <button
+                onClick={addInverted}
+                disabled={loadingSold || selected.size === 0}
+                className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-lg border border-border hover:bg-surface disabled:opacity-40 text-muted-foreground ml-2"
+                title="Agrega el inverso del último número seleccionado"
+              >
+                Invertido
+              </button>
+            </div>
+
             <button
               onClick={() => fetchSold(true)}
               disabled={loadingSold}
-              className="inline-flex items-center gap-1.5 text-sm px-4 py-2.5 rounded-lg border border-border hover:bg-surface disabled:opacity-40 transition"
+              className="inline-flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg border border-border hover:bg-surface disabled:opacity-40 transition ml-auto"
             >
               <RefreshCw size={14} className={loadingSold ? "animate-spin" : ""} />
-              Actualizar
+              Refrescar
             </button>
           </div>
 

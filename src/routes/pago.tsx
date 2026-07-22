@@ -219,7 +219,7 @@ function PagoPage() {
       <main className="pt-28 pb-24">
         <div className="mx-auto max-w-6xl px-4 md:px-6">
           <button
-            onClick={() => navigate({ to: "/numeros" })}
+            onClick={() => navigate({ to: "/" })}
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6"
           >
             <ArrowLeft size={14} /> Volver a elegir números
@@ -276,10 +276,10 @@ function PagoPage() {
 
                 <div className="grid sm:grid-cols-2 gap-3">
                   <Field label="Nombre completo *" value={form.nombre} onChange={(v) => setForm({ ...form, nombre: v })} />
-                  <Field label="Cédula" value={form.cedula} onChange={(v) => setForm({ ...form, cedula: v })} />
-                  <Field label="WhatsApp *" value={form.telefono} onChange={(v) => setForm({ ...form, telefono: v })} placeholder="8888-0000" />
+                  <Field label="Cédula" value={form.cedula} onChange={(v) => setForm({ ...form, cedula: v.replace(/\D/g, '') })} inputMode="numeric" />
+                  <Field label="WhatsApp *" value={form.telefono} onChange={(v) => setForm({ ...form, telefono: v.replace(/\D/g, '') })} placeholder="88880000" type="tel" inputMode="numeric" />
                   <Field label="Email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} type="email" />
-                  <Field label="Referencia SINPE *" value={form.referencia} onChange={(v) => setForm({ ...form, referencia: v })} placeholder="Últimos 6 dígitos" className="sm:col-span-2" />
+                  <Field label="Referencia SINPE *" value={form.referencia} onChange={(v) => setForm({ ...form, referencia: v.replace(/\D/g, '') })} placeholder="Últimos dígitos" inputMode="numeric" className="sm:col-span-2" />
                 </div>
 
                 <label className="block">
@@ -367,11 +367,11 @@ function SinpeRow({ label, value, onCopy, copied, mono }: { label: string; value
   );
 }
 
-function Field({ label, value, onChange, placeholder, type = "text", className = "" }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string; className?: string }) {
+function Field({ label, value, onChange, placeholder, type = "text", inputMode, className = "" }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string; inputMode?: "text" | "numeric" | "tel" | "search" | "email" | "url" | "none" | "decimal"; className?: string }) {
   return (
     <label className={`block ${className}`}>
       <span className="text-xs uppercase tracking-widest text-muted-foreground">{label}</span>
-      <input type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
+      <input type={type} inputMode={inputMode} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
         className="mt-1.5 w-full bg-surface border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
     </label>
   );

@@ -40,12 +40,14 @@ export async function sendStatusEmail(
 
     const { data, error } = await resend.emails.send({
       from: "AutoSorteos506 <sorteos@puracode.xyz>", // Dominio verificado en Resend
+      reply_to: "info@autosorteos506.com",
       to: [to],
       subject,
+      text: `Hola ${name},\n\nEl total de tu orden #${orderId} es de ₡${total.toLocaleString("es-CR")}.\n\nEstado: ${statusText}\n\n${bodyText.replace(/<[^>]+>/g, '')}\n\nTus números: ${numbers.join(", ")}\n\nVerificar estado: https://autosorteos506.com/seguimiento\n\nAutoSorteos506`,
       html: `
         <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #000000; color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #333;">
           <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #111, #222);">
-            <div style="font-size: 24px; font-weight: bold; margin-bottom: 15px;">LOGO</div>
+            <img src="https://autosorteos506.com/autosorteos506.png" alt="AutoSorteos506" style="height: 60px; width: auto; margin-bottom: 15px;" />
             <h1 style="color: ${color}; margin: 0; font-size: 24px;">AutoSorteos506</h1>
             <p style="color: #888; margin-top: 5px; font-size: 14px;">Orden #${orderId} - <span style="color: ${color}">${statusText}</span></p>
           </div>

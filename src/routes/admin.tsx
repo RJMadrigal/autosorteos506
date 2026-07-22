@@ -2,10 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
 import {
   LayoutDashboard, Ticket, DollarSign, Users, CheckCircle2, Clock, XCircle,
-  Search, Download, ExternalLink, ShieldCheck, TrendingUp, Trophy, Lock, Loader2, Ban, LogOut, Edit
+  Search, Download, ExternalLink, ShieldCheck, TrendingUp, Trophy, Lock, Loader2, Ban, LogOut, Edit, History
 } from "lucide-react";
 import { PRIZES, RAFFLE } from "@/data/raffles";
-import { getAdminOrders, updateOrderStatus, blockNumbers, unblockNumbers, getRaffleStats, rebuildAndConfirmOrder, updateOrderNumbers } from "@/lib/api/raffle.functions";
+import { getAdminOrders, updateOrderStatus, blockNumbers, unblockNumbers, getRaffleStats, rebuildAndConfirmOrder, updateOrderDetails, getOrderLogs } from "@/lib/api/raffle.functions";
 import { supabaseBrowser } from "@/lib/supabaseBrowser";
 import { toast } from "sonner";
 
@@ -61,7 +61,17 @@ function AdminPage() {
   const [editOrder, setEditOrder] = useState<DBOrder | null>(null);
   const [editNumbersInput, setEditNumbersInput] = useState("");
   const [editTotalInput, setEditTotalInput] = useState("");
+  const [editNombre, setEditNombre] = useState("");
+  const [editCedula, setEditCedula] = useState("");
+  const [editTelefono, setEditTelefono] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [editReferencia, setEditReferencia] = useState("");
   const [isSavingEdit, setIsSavingEdit] = useState(false);
+
+  // History State
+  const [historyOrder, setHistoryOrder] = useState<DBOrder | null>(null);
+  const [historyLogs, setHistoryLogs] = useState<any[]>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
   const loadData = async (token: string) => {
     try {
@@ -148,7 +158,7 @@ function AdminPage() {
     setIsRebuilding(true);
     
     // Parse the new numbers input
-    const additionalNums = newNumbersInput.split(",").map(n => pad(n.trim())).filter(n => n.length === 4);
+    const additionalNums = newNumbersInput.split(",").map(n => n.trim()).filter(n => n.length > 0 && n.match(/^\d+$/)).map(n => pad(n));
     
     // Combine available numbers with the new ones provided
     const availableOriginals = conflictData.originalNumbers.filter(n => !conflictData.takenNumbers.includes(n));
@@ -184,6 +194,11 @@ function AdminPage() {
     setEditOrder(order);
     setEditNumbersInput(order.numbers.join(", "));
     setEditTotalInput(order.total.toString());
+    setEditNombre(order.nombre || "");
+    setEditCedula(order.cedula || "");
+    setEditTelefono(order.telefono || "");
+    setEditEmail(order.email || "");
+    setEditReferencia(order.referencia || "");
   };
 
   const handleEditNumbersChange = (val: string) => {
@@ -196,15 +211,20 @@ function AdminPage() {
     if (!editOrder || !sessionToken) return;
     setIsSavingEdit(true);
     try {
-      const newNumbers = editNumbersInput.split(",").map(n => pad(n.trim())).filter(n => n.match(/^\d+$/));
+      const newNumbers = editNumbersInput.split(",").map(n => n.trim()).filter(n => n.length > 0 && n.match(/^\d+$/)).map(n => pad(n));
       const newTotal = parseFloat(editTotalInput) || 0;
       
-      const res = await updateOrderNumbers({
+      const res = await updateOrderDetails({
         data: {
           token: sessionToken,
           orderId: editOrder.order_id,
           newNumbers,
-          newTotal
+          newTotal,
+          nombre: editNombre,
+          cedula: editCedula,
+          telefono: editTelefono,
+          email: editEmail,
+          referencia: editReferencia
         }
       });
       
@@ -217,6 +237,21 @@ function AdminPage() {
       toast.error(err.message || "Error al actualizar la orden");
     } finally {
       setIsSavingEdit(false);
+    }
+  };
+
+  const handleOpenHistory = async (order: DBOrder) => {
+    setHistoryOrder(order);
+    setIsLoadingHistory(true);
+    if (!sessionToken) return;
+    try {
+      const res = await getOrderLogs({ data: { token: sessionToken, orderId: order.order_id } });
+      if ((res as any).error) throw new Error((res as any).error);
+      setHistoryLogs(res.logs || []);
+    } catch (err: any) {
+      toast.error(err.message || "Error al cargar historial");
+    } finally {
+      setIsLoadingHistory(false);
     }
   };
 
@@ -293,17 +328,18 @@ function AdminPage() {
       </div>
     );
   }
-
   const pct = Math.round((stats.soldCount / RAFFLE.total) * 100);
 
   return (
     <div className="min-h-screen bg-surface text-foreground">
-      <header className="border-b border-border bg-card/90 backdrop-blur sticky top-0 z-40">
-        <div className="mx-auto max-w-7xl px-4 md:px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="text-2xl font-black tracking-tighter">LOGO</div>
-            <div>
-              <p className="font-display font-semibold leading-tight">Panel Admin</p>
+      <header className="bg-card border-b border-border sticky top-0 z-40">
+        <div className="mx-auto max-w-7xl px-4 md:px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3 text-primary">
+            <img src="/autosorteos506.png" alt="AutoSorteos506" className="h-8 w-auto object-contain drop-shadow-[0_0_10px_rgba(212,175,55,0.2)]" />
+            <div className="hidden md:block h-6 w-px bg-border mx-2"></div>
+            <div className="hidden md:flex items-center gap-1.5">
+              <ShieldCheck size={16} className="text-primary" />
+              <p className="font-display font-semibold leading-tight text-sm">Panel Admin</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -422,6 +458,11 @@ function AdminPage() {
                     <Td>
                       <span className="font-mono text-xs">{t.order_id}</span>
                       <p className="text-muted-foreground text-[10px] whitespace-nowrap">{new Date(t.created_at).toLocaleString()}</p>
+                      {t.order_logs?.[0]?.count ? (
+                        <button onClick={() => handleOpenHistory(t)} className="mt-1 text-[9px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full hover:bg-primary/20 transition">
+                          {t.order_logs[0].count} cambio{t.order_logs[0].count > 1 ? "s" : ""}
+                        </button>
+                      ) : null}
                     </Td>
                     <Td>
                       <p className="font-medium">{t.nombre}</p>
@@ -447,20 +488,22 @@ function AdminPage() {
                     </Td>
                     <Td><StatusBadge status={t.status} /></Td>
                     <Td className="text-right">
-                      <div className="inline-flex gap-1">
-                        <button onClick={() => handleOpenEdit(t)} className="p-1.5 rounded-md bg-blue-500/20 text-blue-400 hover:bg-blue-500/40 transition-colors" title="Editar Números">
-                          <Edit size={16} />
+                      <div className="flex gap-1 justify-end">
+                        <button onClick={() => handleOpenEdit(t)} title="Editar" className="p-1.5 hover:bg-surface rounded text-muted-foreground hover:text-foreground">
+                          <Edit size={14} />
                         </button>
-                        {t.status !== "confirmado" && (
-                          <button onClick={() => setStatus(t.order_id, "confirmado")} className="p-1.5 rounded-md bg-green-500/20 text-green-400 hover:bg-green-500/40 transition-colors" title="Aprobar">
-                            <CheckCircle2 size={16} />
-                          </button>
-                        )}
-                        {t.status !== "rechazado" && (
-                          <button onClick={() => setStatus(t.order_id, "rechazado")} className="p-1.5 rounded-md bg-red-500/20 text-red-400 hover:bg-red-500/40 transition-colors" title="Rechazar">
-                            <XCircle size={16} />
-                          </button>
-                        )}
+                        <button onClick={() => handleOpenHistory(t)} title="Historial" className="p-1.5 hover:bg-surface rounded text-muted-foreground hover:text-foreground">
+                          <History size={14} />
+                        </button>
+                        <button onClick={() => setStatus(t.order_id, "confirmado")} title="Confirmar" className={`p-1.5 rounded ${t.status === "confirmado" ? "text-success bg-success/20 cursor-default" : "text-muted-foreground hover:text-success hover:bg-success/10"}`}>
+                          <CheckCircle2 size={16} />
+                        </button>
+                        <button onClick={() => setStatus(t.order_id, "rechazado")} title="Rechazar" className={`p-1.5 rounded ${t.status === "rechazado" ? "text-destructive bg-destructive/20 cursor-default" : "text-muted-foreground hover:text-destructive hover:bg-destructive/10"}`}>
+                          <Ban size={16} />
+                        </button>
+                        <button onClick={() => setStatus(t.order_id, "pendiente")} title="Revertir a Pendiente" className={`p-1.5 rounded ${t.status === "pendiente" ? "text-warning bg-warning/20 cursor-default" : "text-muted-foreground hover:text-warning hover:bg-warning/10"}`}>
+                          <Clock size={16} />
+                        </button>
                       </div>
                     </Td>
                   </tr>
@@ -526,23 +569,46 @@ function AdminPage() {
           <div className="bg-card border border-border rounded-2xl p-6 max-w-md w-full shadow-gold relative">
             <h2 className="font-display text-xl font-bold mb-4">Editar Orden</h2>
             
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <label className="block">
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground block mb-1">Nombre</span>
+                <input value={editNombre} onChange={e => setEditNombre(e.target.value)} className="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm" />
+              </label>
+              <label className="block">
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground block mb-1">Cédula</span>
+                <input value={editCedula} onChange={e => setEditCedula(e.target.value)} className="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm" />
+              </label>
+              <label className="block">
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground block mb-1">Teléfono</span>
+                <input value={editTelefono} onChange={e => setEditTelefono(e.target.value)} className="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm" />
+              </label>
+              <label className="block">
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground block mb-1">Email</span>
+                <input value={editEmail} onChange={e => setEditEmail(e.target.value)} className="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm" />
+              </label>
+              <label className="block col-span-2">
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground block mb-1">Referencia SINPE</span>
+                <input value={editReferencia} onChange={e => setEditReferencia(e.target.value)} className="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm" />
+              </label>
+            </div>
+
             <label className="block mb-4">
-              <span className="text-xs uppercase tracking-widest text-muted-foreground block mb-1">Números (separados por coma)</span>
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground block mb-1">Números (separados por coma)</span>
               <textarea
                 value={editNumbersInput}
                 onChange={e => handleEditNumbersChange(e.target.value)}
-                className="w-full bg-surface border border-border rounded-lg px-4 py-3 text-sm font-mono min-h-[100px]"
-                placeholder="Ej: 0012, 0104, 1500"
+                className="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm font-mono min-h-[60px]"
+                placeholder="Ej: 0012, 0104"
               />
             </label>
 
             <label className="block mb-6">
-              <span className="text-xs uppercase tracking-widest text-muted-foreground block mb-1">Total a cobrar (₡)</span>
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground block mb-1">Total a cobrar (₡)</span>
               <input
                 type="number"
                 value={editTotalInput}
                 onChange={e => setEditTotalInput(e.target.value)}
-                className="w-full bg-surface border border-border rounded-lg px-4 py-2.5 text-sm tabular-nums font-bold"
+                className="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm tabular-nums font-bold"
               />
             </label>
             
@@ -561,6 +627,50 @@ function AdminPage() {
               >
                 {isSavingEdit ? <Loader2 className="animate-spin" size={16} /> : "Guardar Cambios"}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* History Modal */}
+      {historyOrder && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-end">
+          <div className="bg-card border-l border-border max-w-md w-full h-full p-6 shadow-gold flex flex-col animate-fade-left">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-display text-xl font-bold">Bitácora de Orden</h2>
+              <button onClick={() => setHistoryOrder(null)} className="text-muted-foreground hover:text-foreground">
+                <XCircle size={20} />
+              </button>
+            </div>
+            
+            <div className="mb-6 bg-surface-2 p-3 rounded-lg border border-border text-xs">
+              <p><span className="text-muted-foreground">ID:</span> <span className="font-mono">{historyOrder.order_id}</span></p>
+              <p><span className="text-muted-foreground">Cliente:</span> {historyOrder.nombre}</p>
+            </div>
+
+            <div className="flex-1 overflow-y-auto space-y-4 pr-2">
+              {isLoadingHistory ? (
+                <div className="flex justify-center p-8"><Loader2 className="animate-spin text-primary" size={24} /></div>
+              ) : historyLogs.length === 0 ? (
+                <p className="text-center text-sm text-muted-foreground p-8">No hay registros para esta orden.</p>
+              ) : (
+                historyLogs.map(log => (
+                  <div key={log.id} className="relative pl-4 border-l-2 border-border pb-4 last:border-0 last:pb-0">
+                    <div className="absolute left-[-5px] top-0 h-2 w-2 rounded-full bg-primary ring-4 ring-card"></div>
+                    <div className="text-[10px] text-muted-foreground mb-1 flex justify-between">
+                      <span>{new Date(log.created_at).toLocaleString()}</span>
+                      <span className="uppercase tracking-widest opacity-70">{log.performed_by}</span>
+                    </div>
+                    <p className="text-sm font-semibold capitalize text-foreground">{log.action.replace("_", " ")}</p>
+                    
+                    {log.details && (
+                      <div className="mt-2 bg-surface rounded p-2 text-[10px] font-mono overflow-x-auto border border-white/5">
+                        <pre className="text-muted-foreground">{JSON.stringify(log.details, null, 2)}</pre>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

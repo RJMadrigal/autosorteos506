@@ -1,16 +1,4 @@
-import mini01 from "@/assets/cooper/_DSC6777.jpg.png";
-import mini02 from "@/assets/cooper/_DSC6785.jpg.jpeg";
-import mini03 from "@/assets/cooper/_DSC6786.jpg.jpeg";
-import mini04 from "@/assets/cooper/_DSC6797.jpg.jpeg";
-import mini05 from "@/assets/cooper/_DSC6798.jpg.jpeg";
-import mini06 from "@/assets/cooper/_DSC6799.jpg.jpeg";
 
-import merc01 from "@/assets/mercedez/_DSC6855.jpg.jpeg";
-import merc02 from "@/assets/mercedez/_DSC6861.jpg.jpeg";
-import merc03 from "@/assets/mercedez/_DSC6864.jpg.jpeg";
-import merc04 from "@/assets/mercedez/_DSC6865.jpg.jpeg";
-import merc05 from "@/assets/mercedez/_DSC6908.jpg.jpeg";
-import merc06 from "@/assets/mercedez/_DSC6910.jpg.jpeg";
 
 export type Prize = {
   id: string;

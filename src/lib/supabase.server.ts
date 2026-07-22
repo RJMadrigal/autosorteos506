@@ -31,3 +31,16 @@ export const supabaseServer = createClient(supabaseUrl, supabaseKey, {
   realtime: { transport: ws },
 });
 
+export async function logOrderAction(orderId: string, action: string, details: any, performedBy: string = 'sistema') {
+  try {
+    const { error } = await supabaseServer.from("order_logs").insert({
+      order_id: orderId,
+      action,
+      details,
+      performed_by: performedBy
+    });
+    if (error) console.error("Error logging action:", error.message);
+  } catch (err) {
+    console.error("Exception logging action:", err);
+  }
+}
